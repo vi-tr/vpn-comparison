@@ -1,0 +1,15 @@
+result*/
+log*/
+*.key
+*.pem
+*.crt
+keys/
+!keys/.keep
+pki/
+big_data.json
+
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
