@@ -1,0 +1,31 @@
+services:
+  server:
+    build:
+      context: ../scripts
+      dockerfile: ../baseline/Dockerfile
+    container_name: baseline-server
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    ports:
+      - "5201:5201"
+    command: "iperf3 -J -s --json-stream"
+
+  client:
+    build:
+      context: ../scripts
+      dockerfile: ../baseline/Dockerfile
+    container_name: baseline-client
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    volumes:
+      - ./result:/app/log
+      - ../data:/app/data
+    environment:
+      - SOFTWARE=baseline
+      - DATA_PATH=/app/data/big_data.json
+      - LOG_PATH=/app/log
+    depends_on:
+      - server
+    command: "sh -e -x /app/client.sh server"
