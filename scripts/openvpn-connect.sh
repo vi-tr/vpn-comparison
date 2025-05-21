@@ -37,4 +37,4 @@ EOF
 
 openvpn --config client.ovpn &
 
-sh -e -x /app/client.sh "10.0.0.1"
+sh -e -x /app/client.sh 10.0.0.1

@@ -13,4 +13,4 @@ EOL
 
 wg-quick up wg0-client
 
-sh -e -x /app/client.sh "10.0.0.1"
+sh -e -x /app/client.sh 10.0.0.1
