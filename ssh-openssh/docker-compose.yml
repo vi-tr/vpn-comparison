@@ -1,0 +1,34 @@
+services:
+  server:
+    build:
+      context: ../scripts
+      dockerfile: ../ssh-openssh/Dockerfile
+    container_name: ssh-openssh-server
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    volumes:
+      - ./keys:/app/keys
+    ports:
+      - "22:22/tcp"
+    command: "sh -e -x /app/server.sh"
+
+  client:
+    build:
+      context: ../scripts
+      dockerfile: ../ssh-openssh/Dockerfile
+    container_name: ssh-openssh-client
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    volumes:
+      - ./keys:/app/keys
+      - ./result:/app/log
+      - ../data:/app/data
+    environment:
+      - SOFTWARE=ssh-openssh
+      - DATA_PATH=/app/data/big_data.json
+      - LOG_PATH=/app/log
+    depends_on:
+      - server
+    command: "sh -e -x /app/connect.sh"

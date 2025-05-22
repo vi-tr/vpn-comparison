@@ -1,0 +1,35 @@
+services:
+  server:
+    build:
+      context: ../scripts
+      dockerfile: ../ipsec-strongswan/Dockerfile
+    container_name: ipsec-strongswan-server
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    volumes:
+      - ./keys:/app/keys
+    ports:
+      - "500:500/udp"
+      - "4500:4500/udp"
+    command: "sh -e -x /app/server.sh"
+
+  client:
+    build:
+      context: ../scripts
+      dockerfile: ../ipsec-strongswan/Dockerfile
+    container_name: ipsec-strongswan-client
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    volumes:
+      - ./keys:/app/keys
+      - ./result:/app/log
+      - ../data:/app/data
+    environment:
+      - SOFTWARE=ipsec-strongswan
+      - DATA_PATH=/app/data/big_data.json
+      - LOG_PATH=/app/log
+    depends_on:
+      - server
+    command: "sh -e -x /app/connect.sh"
