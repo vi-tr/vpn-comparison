@@ -112,7 +112,7 @@ if __name__ == "__main__":
                     start = interval["start"]
                     starts.append(start + offset)
                     data.append(get_data(interval, args.metric))
-                offset += intervals[-1]["end"] + 3
+                offset += intervals[-1]["end"] + 3 if len(intervals) else 3
             plt.plot(
                 starts,
                 # Matplotlib can plot lists with missing values just fine
