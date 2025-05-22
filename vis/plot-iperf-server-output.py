@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 # Helper functions
 
+
 def zip_left(x: list, y: list, fillvalue=None) -> Iterator[tuple]:
     if len(x) > len(y):
         return zip_longest(x, y, fillvalue=fillvalue)
@@ -68,6 +69,12 @@ if __name__ == "__main__":
     )
     parser.add_argument("-f", "--main-title", type=str, help="Title of the figure")
     parser.add_argument(
+        "-b",
+        "--monochrome-printer",
+        action="store_true",
+        help="Use line styles instead of colors in plots",
+    )
+    parser.add_argument(
         "-t", "--title", type=str, nargs="+", help="Title for the plots"
     )
     parser.add_argument(
@@ -101,6 +108,10 @@ if __name__ == "__main__":
     elif args.metric == "rtt":
         plt.ylabel("Круговая задержка (мс)")
 
+    linestylecounter = 0
+    linestyles = ["solid", "dashed", "dashdot", "dotted", "solid", "dashed"]
+    markers = ["none", "none", "none", "none", "x", "P"]
+
     for i, file in enumerate(args.ndjson_file):
         all_intervals = extract_intervals(file)
         if args.single:  # Concat runs
@@ -113,12 +124,24 @@ if __name__ == "__main__":
                     starts.append(start + offset)
                     data.append(get_data(interval, args.metric))
                 offset += intervals[-1]["end"] + 3 if len(intervals) else 3
-            plt.plot(
-                starts,
-                # Matplotlib can plot lists with missing values just fine
-                data,  # type: ignore
-                label=args.title[i] if args.title and len(args.title) > i else file,
-            )
+            if args.monochrome_printer:
+                plt.plot(
+                    starts,
+                    # Matplotlib can plot lists with missing values just fine
+                    data,  # type: ignore
+                    label=args.title[i] if args.title and len(args.title) > i else file,
+                    color="black",
+                    linestyle=linestyles[linestylecounter % len(linestyles)],
+                    marker=markers[linestylecounter % len(linestyles)],
+                )
+                linestylecounter += 1
+            else:
+                plt.plot(
+                    starts,
+                    # Matplotlib can plot lists with missing values just fine
+                    data,  # type: ignore
+                    label=args.title[i] if args.title and len(args.title) > i else file,
+                )
         else:  # Plot different runs separately
             all_data: list[list[float | None]] = []
             all_starts: list[list[float]] = []
@@ -130,11 +153,22 @@ if __name__ == "__main__":
                     starts.append(start)
                     data.append(get_data(interval, args.metric))
             for j, (starts, data) in enumerate(zip(all_starts, all_data)):
-                plt.plot(
-                    starts,
-                    data,  # type: ignore
-                    label=f"{args.title[i] if args.title and len(args.title) > i else file} (забег {j+1})",
-                )
+                if args.monochrome_printer:
+                    plt.plot(
+                        starts,
+                        data,  # type: ignore
+                        label=f"{args.title[i] if args.title and len(args.title) > i else file} (забег {j+1})",
+                        color="black",
+                        linestyle=linestyles[linestylecounter % len(linestyles)],
+                        marker=markers[linestylecounter % len(linestyles)],
+                    )
+                    linestylecounter += 1
+                else:
+                    plt.plot(
+                        starts,
+                        data,  # type: ignore
+                        label=f"{args.title[i] if args.title and len(args.title) > i else file} (забег {j+1})",
+                    )
 
     plt.legend(loc="upper right")
     plt.grid()
