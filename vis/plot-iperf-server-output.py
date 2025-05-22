@@ -78,7 +78,7 @@ if __name__ == "__main__":
         "--metric",
         type=str,
         default="bandwidth",
-        help="Which metric to graph over time",
+        help="Which metric to graph over time. One of: bandwidth, bytes, lost, lost-percentage (UDP only), jitter (UDP only), rtt (TCP only)",
     )
     args = parser.parse_args()
 
